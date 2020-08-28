@@ -1,0 +1,10 @@
+<?php
+
+namespace {{ namespace }};
+
+use Restive\Controllers\ApiController;
+
+class {{ class }} extends ApiController
+{
+    protected $modelName = {{ model }};
+}
