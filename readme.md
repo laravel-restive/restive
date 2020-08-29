@@ -1,7 +1,6 @@
 # Api Query Builder #
 
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/laravel-restive/restive/blob/master/LICENSE)
-[![Read the Docs](https://readthedocs.org/projects/laravel-restive/badge/?version=latest&style=flat)](https://laravel-rest-api.readthedocs.io/en/latest/)
 
 ## Introduction ##
 
