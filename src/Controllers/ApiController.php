@@ -73,29 +73,6 @@ class ApiController extends AbstractApiController
         ]);
     }
 
-    /**
-     * @param mixed $id
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function updateById($id, Request $request)
-    {
-        $result = $this->model->find($id);
-        if (!$result) {
-            return $this->setStatusCode(400)->respondWithError('item does not exist');
-        }
-        $validator = Validator::make($request->all(), $this->loadRules($id));
-        if ($validator->fails()) {
-            return $this->setStatusCode(400)->respondWithError($validator->errors());
-        }
-
-        $result->update($request->all());
-
-        return $this->respond([
-            'data' => $result->toArray()
-        ]);
-    }
-
     public function destroy(Request $request, $id = null): jsonResponse
     {
         $this->convertIdToParserWhere($id, $request);
@@ -117,9 +94,12 @@ class ApiController extends AbstractApiController
 
     public function update(Request $request, $id = null): jsonResponse
     {
+        $this->convertIdToParserWhere($id, $request);
         if (isset($id)) {
-            $response = $this->updateById($id, $request);
-            return $response;
+            $validator = Validator::make($request->all(), $this->loadRules($id));
+            if ($validator->fails()) {
+                return $this->setStatusCode(400)->respondWithError($validator->errors());
+            }
         }
         try {
             $parser = new ApiQueryParser(new ParserFactory());

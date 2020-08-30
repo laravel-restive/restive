@@ -23,21 +23,20 @@ class PutTest extends DatabaseTestCase
         ]);
         $response->assertStatus(200);
         $response = json_decode($response->getContent());
-        $this->assertTrue($response->data->age === 45);
+        $this->assertTrue($response->data === 'affected rows = 1');
     }
 
     /** @test */
     public function updates_a_nonexistent_item()
     {
-        $newID = $this->createEntry();
         $response = $this->put("/user/1001", [
             'email' => 'dirk@holisticdetective.com',
             'name' => 'Dirk Gently',
             'age' => 45
         ]);
-        $response->assertStatus(400);
+        $response->assertStatus(200);
         $response = json_decode($response->getContent());
-        $this->assertTrue($response->error->message === 'item does not exist');
+        $this->assertTrue($response->data === 'affected rows = 0');
     }
 
     /** @test */
@@ -50,7 +49,7 @@ class PutTest extends DatabaseTestCase
             'age' => 38
         ]);
         $response = json_decode($response->getContent());
-        $message = $response->error->message->email[0];
+        $message = $response->error->message->email;
         $this->assertContains('The email has already been taken.', $message);
     }
 
