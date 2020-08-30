@@ -44,7 +44,6 @@ class DeleteTest extends DatabaseTestCase
 
     }
 
-
     /** @test */
     public function deletes_a_nonexistent_resource_using_where()
     {
