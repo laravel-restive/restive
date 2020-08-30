@@ -13,7 +13,7 @@ class DeleteTest extends DatabaseTestCase
         $response = $this->delete("/user/1");
         $response->assertStatus(200);
         $data = $response->getData()->data;
-        $this->assertEquals($data->id, 1);
+        $this->assertEquals($data[0]->id, 1);
     }
 
 
@@ -57,7 +57,9 @@ class DeleteTest extends DatabaseTestCase
     public function deletes_a_nonexistent_resource_using_id()
     {
         $response = $this->delete("/user/1001");
-        $response->assertStatus(400);
+        $response->assertStatus(200);
+        $data = $response->getData()->data;
+        $this->assertTrue(count($data) === 0);
     }
 
     /** @test */
@@ -66,7 +68,6 @@ class DeleteTest extends DatabaseTestCase
         $response = $this->delete("/user?foo=id:eq:1001");
         $response->assertStatus(400);
     }
-
 
     /** @test */
     public function gets_items_with_trashed_items()
@@ -102,5 +103,16 @@ class DeleteTest extends DatabaseTestCase
         $response = $this->get("/dummy?paginate=no&withTrashed=");
         $response = json_decode($response->getContent());
         $this->assertTrue($response->error->message === 'Model does not support soft deletes');
+    }
+
+    /** @test */
+    public function force_deletes_a_single_item()
+    {
+        $user = new ZcwiltUser();
+        $countBefore = $user->all()->count();
+        $response = $this->delete("/user/1?force=true");
+        $countAfter = $user->withTrashed()->count();
+        $response->assertStatus(200);
+        $this->assertTrue($countBefore != $countAfter);
     }
 }

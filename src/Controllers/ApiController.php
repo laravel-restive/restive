@@ -96,30 +96,9 @@ class ApiController extends AbstractApiController
         ]);
     }
 
-    /**
-     * @param mixed $id
-     * @return JsonResponse
-     */
-    public function destroyById($id): jsonResponse
-    {
-        $result = $this->model->find($id);
-        if (!$result) {
-            return $this->setStatusCode(400)->respondWithError('item does not exist');
-        }
-        $result->delete();
-        return $this->respond([
-            'data' => $result
-        ]);
-    }
-
-
-
     public function destroy(Request $request, $id = null): jsonResponse
     {
-        if (isset($id)) {
-            $response = $this->destroyById($id);
-            return $response;
-        }
+        $this->convertIdToParserWhere($id, $request);
         try {
             $parser = new ApiQueryParser(new ParserFactory());
             $query = $parser->parseRequest($request)->buildparsers()->buildQuery($this->model);
@@ -127,7 +106,7 @@ class ApiController extends AbstractApiController
             $message = $this->handleExceptionMessage($e);
             return $this->setStatusCode(400)->respondWithError($message);
         }
-        $result=$query->get();
+        $result = $query->get();
         $query->each(function ($record) {
             $record->delete();
         });
@@ -171,6 +150,17 @@ class ApiController extends AbstractApiController
     protected function stripQueryParams(Request $request)
     {
         $request = Request::create('/', 'GET', $request->request->all());
+        return $request;
+    }
+
+    protected function convertIdToParserWhere($id, Request $request)
+    {
+        if (!isset($id)) {
+            return $request;
+        }
+        $key = $this->model->getKeyName();
+        $where = $key . ':eq:' . $id;
+        $request->query->add(['where' => [$where]]);
         return $request;
     }
 }

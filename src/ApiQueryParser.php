@@ -39,6 +39,7 @@ class ApiQueryParser
         if (count($queryParams)) {
             $this->gatherKeys($queryParams);
         }
+        $this->sortParsedKeys();
         return $this;
     }
 
@@ -119,7 +120,16 @@ class ApiQueryParser
     protected function getQueryParams(Request $request): array
     {
         $params = $request->query();
-        //$params = array_merge($params, $request->all());
         return $params;
+    }
+
+    protected function sortParsedKeys()
+    {
+        if (!key_exists('force', $this->parsedKeys)) {
+            return;
+        }
+        $forced = $this->parsedKeys['force'];
+        unset($this->parsedKeys['force']);
+        $this->parsedKeys['force'] = $forced;
     }
 }
