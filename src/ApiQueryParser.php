@@ -34,10 +34,10 @@ class ApiQueryParser
 
     public function parseRequest(Request $request): ApiQueryParser
     {
-        $request = $this->extractSpecialParseKey($request);
         $this->parsedKeys = [];
-        if (count($this->getQueryParams($request))) {
-            $this->gatherKeys($request);
+        $queryParams = $this->getQueryParams($request);
+        if (count($queryParams)) {
+            $this->gatherKeys($queryParams);
         }
         return $this;
     }
@@ -73,10 +73,10 @@ class ApiQueryParser
         return $this->parsedKeys;
     }
 
-    protected function gatherKeys(Request $request)
+    protected function gatherKeys(array $queryParams)
     {
-        $ignoreKeys = ['page', 'per_page', 'paginate', 'fields'];
-        foreach ($this->getQueryParams($request) as $key => $value) {
+        $ignoreKeys = ['page', 'per_page', 'paginate'];
+        foreach ($queryParams as $key => $value) {
             if (in_array($key, $ignoreKeys)) {
                 continue;
             }
@@ -119,16 +119,7 @@ class ApiQueryParser
     protected function getQueryParams(Request $request): array
     {
         $params = $request->query();
-        $params = array_merge($params, $request->all());
+        //$params = array_merge($params, $request->all());
         return $params;
-    }
-
-    protected function extractSpecialParseKey($request)
-    {
-        if (!$request->has('@parser')) {
-            return $request;
-        }
-        $request = new Request($request->input('@parser'));
-        return $request;
     }
 }

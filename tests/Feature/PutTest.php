@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Request;
 use Tests\DatabaseTestCase;
 
 class PutTest extends DatabaseTestCase
@@ -70,11 +71,10 @@ class PutTest extends DatabaseTestCase
     public function updates_using_a_where_clause()
     {
         $newID = $this->createEntry();
-        $response = $this->put("/user", [
+        $response = $this->put("/user?where[]=email:eq:dirk@holisticdetective.com", [
             'email' => 'dirk@holisticdetective.com',
             'name' => 'Dirk Gently',
             'age' => 45,
-            '@parser' => ['where' => ['email:eq:dirk@holisticdetective.com']]
         ]);
         $response = json_decode($response->getContent());
         $this->assertTrue($response->data === 'affected rows = 1');
@@ -90,6 +90,4 @@ class PutTest extends DatabaseTestCase
         $newID = json_decode($response->getContent())->data->id;
         return $newID;
     }
-
-
 }

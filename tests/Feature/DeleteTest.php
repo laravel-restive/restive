@@ -22,7 +22,7 @@ class DeleteTest extends DatabaseTestCase
     {
         $user = new ZcwiltUser();
         $countBefore = $user->all()->count();
-        $response = $this->delete("/user", ['@parser' => ['where' => ['id:eq:2']]]);
+        $response = $this->delete("/user?where[]=id:eq:2");
         $countAfter = $user->all()->count();
         $data = $response->getData()->data;
         $this->assertEquals($data[0]->id, 2);
@@ -34,7 +34,7 @@ class DeleteTest extends DatabaseTestCase
     {
         $user = new ZcwiltUser();
         $countBefore = $user->all()->count();
-        $response = $this->delete("/user", ['@parser' => ['whereBetween' => ['age:13:19']]]);
+        $response = $this->delete("/user?whereBetween=age:13:19");
         $countAfter = $user->all()->count();
         $data = $response->getData()->data;
         $deletedCount = count($data);
@@ -48,7 +48,7 @@ class DeleteTest extends DatabaseTestCase
     /** @test */
     public function deletes_a_nonexistent_resource_using_where()
     {
-        $response = $this->delete("/user", ['@parser' => ['where' => ['id:eq:1001']]]);
+        $response = $this->delete("/user?where=id:eq:1001");
         $data = $response->getData()->data;
         $this->assertTrue(count($data) === 0);
     }
@@ -63,7 +63,7 @@ class DeleteTest extends DatabaseTestCase
     /** @test */
     public function deletes_a__resource_using_invalid_parser()
     {
-        $response = $this->delete("/user", ['@parser' => ['foo' => ['id:eq:1001']]]);
+        $response = $this->delete("/user?foo=id:eq:1001");
         $response->assertStatus(400);
     }
 
@@ -82,8 +82,6 @@ class DeleteTest extends DatabaseTestCase
     /** @test */
     public function gets_only_trashed_items()
     {
-        $model = new ZcwiltUser();
-        $testResult = $model->get();
         $this->delete("/user/1");
         $response = $this->get("/user?paginate=no&onlyTrashed=");
         $data = $response->getData()->data;

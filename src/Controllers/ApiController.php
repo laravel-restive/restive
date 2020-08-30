@@ -145,7 +145,8 @@ class ApiController extends AbstractApiController
         try {
             $parser = new ApiQueryParser(new ParserFactory());
             $query = $parser->parseRequest($request)->buildparsers()->buildQuery($this->model);
-            $result = $query->update($request->except('@parser'));
+            $request = $this->stripQueryParams($request);
+            $result = $query->update($request->all());
         } catch (\Exception $e) {
             $message = $this->handleExceptionMessage($e);
             return $this->setStatusCode(400)->respondWithError($message);
@@ -165,5 +166,11 @@ class ApiController extends AbstractApiController
             return $this->model->rules($id);
         }
         return [];
+    }
+
+    protected function stripQueryParams(Request $request)
+    {
+        $request = Request::create('/', 'GET', $request->request->all());
+        return $request;
     }
 }
