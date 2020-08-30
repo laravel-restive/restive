@@ -20,10 +20,30 @@ class DeleteTest extends DatabaseTestCase
     /** @test */
     public function deletes_a_resource_using_where()
     {
+        $user = new ZcwiltUser();
+        $countBefore = $user->all()->count();
         $response = $this->delete("/user", ['@parser' => ['where' => ['id:eq:2']]]);
+        $countAfter = $user->all()->count();
         $data = $response->getData()->data;
         $this->assertEquals($data[0]->id, 2);
+        $this->assertEquals($countAfter, $countBefore-1);
     }
+
+    /** @test */
+    public function deletes_multiple_entries()
+    {
+        $user = new ZcwiltUser();
+        $countBefore = $user->all()->count();
+        $response = $this->delete("/user", ['@parser' => ['whereBetween' => ['age:13:19']]]);
+        $countAfter = $user->all()->count();
+        $data = $response->getData()->data;
+        $deletedCount = count($data);
+        $trashedCount = $user->onlyTrashed()->count();
+        $this->assertEquals($countAfter, $countBefore-$deletedCount);
+        $this->assertEquals($deletedCount, $trashedCount);
+
+    }
+
 
     /** @test */
     public function deletes_a_nonexistent_resource_using_where()
