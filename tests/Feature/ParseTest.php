@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Config;
 use Tests\Fixtures\Controllers\Api\ZcwiltUserController;
 use Restive\ModelMakerFactory;
 use Illuminate\Support\Facades\Request;
@@ -9,7 +10,8 @@ use Tests\DatabaseTestCase;
 
 class ParseTest extends DatabaseTestCase
 {
-    public function testControllerIndexBadParser()
+    /** @test */
+    public function unknown_parser_method_throws_exception()
     {
         $request = Request::create('/index', 'GET', [
             'title' => 'foo',
@@ -42,6 +44,7 @@ class ParseTest extends DatabaseTestCase
         $this->assertTrue(count($response->data) === 1);
         $this->assertTrue($response->data[0]->id === 2);
     }
+
     public function testControllerIndexWithWhereInParser()
     {
         $request = Request::create('/index', 'GET', [
@@ -53,4 +56,14 @@ class ParseTest extends DatabaseTestCase
         $this->assertTrue(count($response->data) === 2);
         $this->assertTrue($response->data[0]->id === 1);
     }
+
+    /** @test */
+     public function blacklisted_parser_method_throws_exception()
+     {
+         Config::set('restive.blacklist', ['where']);
+         $response = $this->get("/user?where[]=id:eq:1");
+         $response->assertStatus(400);
+         $message = json_decode($response->getContent())->error->message;
+         $this->assertContains('Parser method not allowed', $message);
+     }
 }
