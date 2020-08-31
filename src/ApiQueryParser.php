@@ -125,7 +125,7 @@ class ApiQueryParser
 
     protected function sortParsedKeys()
     {
-        if (!key_exists('force', $this->parsedKeys)) {
+        if (!array_key_exists('force', $this->parsedKeys)) {
             return;
         }
         $forced = $this->parsedKeys['force'];

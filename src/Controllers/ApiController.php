@@ -61,12 +61,17 @@ class ApiController extends AbstractApiController
      * @param mixed $id
      * @return JsonResponse
      */
-    public function show($id): jsonResponse
+    public function show(Request $request, $id): jsonResponse
     {
-        $result = $this->model->find($id);
-        if (!$result) {
-            return $this->setStatusCode(400)->respondWithError('item does not exist');
+        $this->convertIdToParserWhere($id, $request);
+        try {
+            $parser = new ApiQueryParser(new ParserFactory());
+            $query = $parser->parseRequest($request)->buildparsers()->buildQuery($this->model);
+        } catch (\Exception $e) {
+            $message = $this->handleExceptionMessage($e);
+            return $this->setStatusCode(400)->respondWithError($message);
         }
+        $result = $query->get();
 
         return $this->respond([
             'data' => $result->toArray()
