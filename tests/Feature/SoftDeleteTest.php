@@ -49,9 +49,9 @@ class SoftDeleteTest extends DatabaseTestCase
         $this->delete("/user/1");
         $response = $this->get("/user/1?withTrashed&restore");
         $data = $response->getData()->data;
-        $this->assertEquals(1, $data[0]->id);
+        $this->assertEquals(1, $data->id);
         $response = $this->get("/user/1");
         $data = $response->getData()->data;
-        $this->assertEquals($data[0]->id, 1);
+        $this->assertEquals($data->id, 1);
     }
 }

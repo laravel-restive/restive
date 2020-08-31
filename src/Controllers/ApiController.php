@@ -72,7 +72,10 @@ class ApiController extends AbstractApiController
             return $this->setStatusCode(400)->respondWithError($message);
         }
         $result = $query->get();
-
+        if ($result->count() === 0) {
+            return $this->setStatusCode(400)->respondWithError('Item does not exist');
+        }
+        $result = $result->first();
         return $this->respond([
             'data' => $result->toArray()
         ]);
