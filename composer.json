@@ -35,5 +35,12 @@
   "scripts": {
     "tests": "phpunit -c phpunit.xml",
     "coverage": "phpunit -c phpunit-cc.xml"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Restive\\RestiveServiceProvider"
+      ]
+    }
   }
 }
