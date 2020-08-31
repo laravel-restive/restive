@@ -33,6 +33,6 @@ class RestiveServiceProvider extends ServiceProvider
     protected function publishFiles()
     {
         $config_files = [__DIR__.'/config' => config_path()];
-        $this->publishes($config_files, 'config');
+        $this->publishes($config_files, 'restive-config');
     }
 }
