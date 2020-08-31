@@ -21,5 +21,11 @@ class RestiveServiceProvider extends ServiceProvider
         if (app()->runningUnitTests()) {
             $this->loadRoutesFrom(__DIR__.'/../tests/Fixtures/routes/api.php');
         }
+        $this->loadConfigs();
+    }
+
+    protected function loadConfigs()
+    {
+        $this->mergeConfigFrom(__DIR__.'/config/restive.php', 'restive');
     }
 }
