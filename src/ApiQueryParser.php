@@ -74,6 +74,22 @@ class ApiQueryParser
         return $this->parsedKeys;
     }
 
+    public function hasPart($part)
+    {
+        if (!isset($this->parsedKeys[$part])) {
+            return false;
+        }
+        return (count($this->parsedKeys[$part]) !== 0);
+    }
+
+    public function getLimit()
+    {
+        if (!$this->hasPart('limit')) {
+            return 0;
+        }
+        return $this->parsedKeys['limit'][0];
+    }
+
     protected function gatherKeys(array $queryParams)
     {
         $ignoreKeys = ['page', 'per_page', 'paginate'];

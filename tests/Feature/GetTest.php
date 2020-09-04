@@ -18,6 +18,15 @@ class GetTest extends DatabaseTestCase
     }
 
     /** @test */
+    public function gets_a_single_item_using_limit()
+    {
+        $response = $this->get("/user?limit[]=1&limit[]=5");
+        $response->assertStatus(200);
+        $response = json_decode($response->getContent());
+        $this->assertTrue($response[0]->id === 1);
+    }
+
+    /** @test */
     public function gets_an_invalid_item()
     {
         $response = $this->get("/user/1001");

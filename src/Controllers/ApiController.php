@@ -27,8 +27,12 @@ class ApiController extends AbstractApiController
         try {
             $parser = new ApiQueryParser(new ParserFactory());
             $query = $parser->parseRequest($request)->buildparsers()->buildQuery($this->model);
-            $count = $query->count();
             $defaultPerpage = 15;
+            $count = $query->count();
+            if ($parser->hasPart('limit')) {
+                $result = $query->get();
+                return $this->respond($result->toArray());
+            }
             if ($request->input('paginate', 'yes') === 'no') {
                 $defaultPerpage = $count;
             }
