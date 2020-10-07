@@ -15,14 +15,14 @@
     }
   },
   "require": {
-    "illuminate/database": "^5.4|^7.0",
-    "illuminate/auth": "^5.4|^7.0"
+    "illuminate/database": "^5.4|^6.0|^7.0|^8.0",
+    "illuminate/auth": "^5.4|^6.0|^7.0|^8.0"
   },
   "require-dev": {
-    "orchestra/testbench": "~3.0",
-    "phpunit/phpunit": "^7.0",
+    "orchestra/testbench": "~5.0|~6.0",
+    "phpunit/phpunit": "^8.0|^9.0",
     "codedungeon/phpunit-result-printer": "^0.19.12",
-    "nunomaduro/collision": "^2.0",
+    "nunomaduro/collision": "^4.0",
     "mockery/mockery": "^1.1"
   },
   "autoload-dev": {
