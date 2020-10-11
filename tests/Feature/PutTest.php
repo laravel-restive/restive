@@ -63,7 +63,7 @@ class PutTest extends DatabaseTestCase
         ]);
         $response = json_decode($response->getContent());
         $message = $response->error->message->email[0];
-        $this->assertContains('The email field is required.', $message);
+        $this->assertStringContainsString('The email field is required.', $message);
     }
 
     /** @test */

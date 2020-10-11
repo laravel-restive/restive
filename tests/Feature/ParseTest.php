@@ -64,6 +64,6 @@ class ParseTest extends DatabaseTestCase
          $response = $this->get("/user?where[]=id:eq:1");
          $response->assertStatus(400);
          $message = json_decode($response->getContent())->error->message;
-         $this->assertContains('Parser method not allowed', $message);
+         $this->assertStringContainsString('Parser method not allowed', $message);
      }
 }

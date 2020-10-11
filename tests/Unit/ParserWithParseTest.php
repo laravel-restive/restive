@@ -72,6 +72,6 @@ class ParserWithParseTest extends DatabaseTestCase
         $response = $controller->index($request);
         $response = json_decode($response->getContent());
         $message = $response->error->message;
-        $this->assertContains('Call to undefined relationship', $message);
+        $this->assertStringContainsString('Call to undefined relationship', $message);
     }
 }
