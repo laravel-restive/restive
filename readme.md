@@ -2,9 +2,9 @@
 
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/laravel-restive/restive/blob/master/LICENSE)
 
-## Introduction ##
+`Note: The v1.* branch is now deprecated, and will shortly be replaced with a v2 branch`
 
-Note 
+## Introduction ##
 
 Api Query Builder allows for complex filtering, sorting via an api endpoint.
 
@@ -17,7 +17,6 @@ but see examples below for an idea of what the package provides.
 ## Installation ##
 
 ``composer require laravel-restive/restive``
-
 
 ## Filtering ##
 
