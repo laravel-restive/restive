@@ -27,7 +27,7 @@ class ApiControllerMethodTests extends TestCase
         $response = $controller->index($request);
         $response = json_decode($response, true);
         $query = User::query()->paginate(10);
-        $this->assertEquals($response['total'], $query->total());
+        $this->assertEquals(count($response), count($query));
     }
 
 
@@ -39,7 +39,7 @@ class ApiControllerMethodTests extends TestCase
         $response = $controller->index($request);
         $response = json_decode($response, true);
         $query = User::query()->whereBetween('age', [1,30])->paginate(10);
-        $this->assertEquals($response['total'], $query->total());
+        $this->assertEquals(count($response),count($query));
     }
 
     /** @test */

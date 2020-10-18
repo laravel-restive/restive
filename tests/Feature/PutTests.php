@@ -46,7 +46,7 @@ class PutTests extends DatabaseTestCase
         ]);
         $response = json_decode($response->getContent());
         $message = $response->errors->email;
-        $this->assertContains('The email has already been taken.', $message[0]);
+        $this->assertStringContainsString('The email has already been taken.', $message[0]);
     }
 
     /** @test */

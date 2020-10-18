@@ -34,7 +34,7 @@ class GetTests extends DatabaseTestCase
         $response = $this->get("/user");
         $response->assertStatus(200);
         $content = json_decode($response->getContent());
-        $this->assertEquals(10, count($content->data));
+        $this->assertEquals(10, count($content));
     }
 
     /** @test */
@@ -44,7 +44,7 @@ class GetTests extends DatabaseTestCase
         $modelResult = $user->whereBetween('id', [1,20])->whereBetween('age', [20,40])->count();
         $response = $this->get("/user?whereBetween[]=id:1:20&whereBetween[]=age:20:40");
         $response->assertStatus(200);
-        $responseResult = count(json_decode($response->getContent())->data);
+        $responseResult = count(json_decode($response->getContent()));
         $this->assertEquals($modelResult, $responseResult);
     }
 

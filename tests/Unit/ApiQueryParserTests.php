@@ -97,7 +97,7 @@ class ApiQueryParserTests extends TestCase
         $this->assertCount(1, $parsers);
         $this->assertInstanceOf(ParserNull::class, $parsers[0]);
         $parserParams = $parsers[0]->getParameters();
-        $this->assertContains('blacklisted method', $parserParams['error']);
+        $this->assertStringContainsString('blacklisted method', $parserParams['error']);
     }
 
     /** @test */
@@ -109,6 +109,6 @@ class ApiQueryParserTests extends TestCase
         $keys = $parser->buildParseKeys($request);
         $parsers = $parser->buildParserList($keys);
         $query = $parser->executeParsers($parsers, $model);
-        $this->assertContains('select * from "users" where "id" = ? and "users"."deleted_at" is null', $query->toSql());
+        $this->assertStringContainsString('select * from "users" where "id" = ? and "users"."deleted_at" is null', $query->toSql());
     }
 }
