@@ -21,7 +21,7 @@ class ApiController extends AbstractApiController
         } catch (ApiException $e) {
             return response()->json(['errors' => $e->getMessage()], $e->getStatusCode());
         }
-        return $resource->toJson();
+        return response()->json($resource);
     }
 
     public function show(Request $request, $id)
@@ -36,14 +36,14 @@ class ApiController extends AbstractApiController
             return response()->json(['error' => 'Item does not exist'], 404);
         }
         $resource = new $this->resource($query);
-        return $resource->toJson();
+        return response()->json($resource);
     }
 
     public function store(Request $request)
     {
         $result = $this->model->create($request->all());
         $resource = new $this->resource($result);
-        return $resource->toJson();
+        return response()->json($resource);
     }
 
     public function update(Request $request, $id = null)
@@ -55,7 +55,7 @@ class ApiController extends AbstractApiController
         $query = $parser->executeParsers($parserList, $this->model);
         $request = $this->stripQueryParams($request);
         $result = $query->update($request->all());
-        return json_encode(['affected_rows' => $result]);
+        return response()->json(['affected_rows' => $result]);
     }
 
     public function destroy(Request $request, $id = null)
@@ -76,6 +76,6 @@ class ApiController extends AbstractApiController
             return response()->json(['errors' => $e->getMessage()], $e->getStatusCode());
         }
         $resource = new $this->resource($result);
-        return $resource->toJson();
+        return response()->json($resource);
     }
 }
