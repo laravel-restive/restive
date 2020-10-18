@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Restive\Parsers;
 
@@ -7,18 +8,19 @@ use Restive\Exceptions\ApiException;
 
 class ParserWithTrashed extends ParserAbstract
 {
-    public function tokenizeParameters(string $parameters)
-    {
-        $this->tokenized[] = '';
-    }
+    protected $validator = ['boolean'];
 
-    public function prepareQuery(Builder $eloquentBuilder): Builder
+    public function buildQuery(Builder $query) : Builder
     {
-        try {
-            $eloquentBuilder = $eloquentBuilder->withTrashed();
-        } catch (\BadMethodCallException $e) {
-            throw new ApiException('Model does not support soft deletes');
+        if ($this->tokens[0] !== 'true') {
+            return $query;
         }
-        return $eloquentBuilder;
+        try {
+            $query = $query->withTrashed();
+        } catch (\BadMethodCallException $e) {
+            $apiException = new ApiException('Model does not support soft deletes');
+            throw $apiException;
+        }
+        return $query;
     }
 }

@@ -1,33 +1,34 @@
 <?php
+declare(strict_types = 1);
 
 namespace Restive\Parsers;
 
-use Restive\Exceptions\ParserParameterCountException;
 use Illuminate\Database\Eloquent\Builder;
 
 class ParserSort extends ParserAbstract
 {
-    public function tokenizeParameters(string $parameters)
+    protected $validator = ['separated', ',', null];
+
+    public function tokenize()
     {
-        $parameters = $this->handleSeparatedParameters($parameters);
-        if (count($parameters) === 0) {
-            throw new ParserParameterCountException("sort parser - missing parameters");
-        }
-        foreach ($parameters as $field) {
+        parent::tokenize();
+        $parts = $this->tokens;
+        $this->tokens = [];
+        foreach ($parts as $part) {
             $sortDirection = 'ASC';
-            if (isset($field[0]) && $field[0] == '-') {
+            if (isset($part[0]) && $part[0] == '-') {
                 $sortDirection = 'DESC';
-                $field = substr($field, 1);
+                $part = substr($part, 1);
             }
-            $this->tokenized[] = ['field' => $field, 'direction' => $sortDirection];
+            $this->tokens[] = ['field' => $part, 'direction' => $sortDirection];
         }
     }
 
-    public function prepareQuery(Builder $eloquentBuilder): Builder
+    public function buildQuery(Builder $query) : Builder
     {
-        foreach ($this->tokenized as $parameters) {
-            $eloquentBuilder = $eloquentBuilder->orderBy($parameters['field'], $parameters['direction']);
+        foreach ($this->tokens as $parameters) {
+            $query = $query->orderBy($parameters['field'], $parameters['direction']);
         }
-        return $eloquentBuilder;
+        return $query;
     }
 }

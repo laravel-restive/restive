@@ -1,14 +1,17 @@
 <?php
+declare(strict_types = 1);
 
 namespace Restive\Parsers;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class ParserOrWhereNotBetween extends ParserWhereBetweenAbstract
+class ParserOrWhereNotBetween extends ParserWhereAbstract
 {
-    public function prepareQuery(Builder $eloquentBuilder): Builder
+    protected $validator = ['separated', ':', 3];
+
+    public function buildQuery(Builder $query) : Builder
     {
-        $eloquentBuilder = $eloquentBuilder->orWhereNotBetween($this->tokenized[0], [$this->tokenized[1], $this->tokenized[2]]);
-        return $eloquentBuilder;
+        $query = $query->orWhereNotBetween($this->tokens[0], [$this->tokens[1], $this->tokens[2]]);
+        return $query;
     }
 }

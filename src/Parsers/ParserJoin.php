@@ -1,36 +1,18 @@
 <?php
+declare(strict_types = 1);
 
 namespace Restive\Parsers;
 
 use Illuminate\Database\Eloquent\Builder;
-use Restive\Exceptions\ParserInvalidParameterException;
-use Restive\Exceptions\ParserParameterCountException;
 
 class ParserJoin extends ParserAbstract
 {
-    /**
-     * @var array
-     */
-    protected $operatorMap = [
-        'inner', 'left', 'cross'
-    ];
+    protected $validator = ['separated', ':', 4];
 
-    public function tokenizeParameters(string $parameters)
+    public function buildQuery(Builder $query) : Builder
     {
-        $parameters = $this->handleSeparatedParameters($parameters, ':');
-        if (count($parameters) !== 4) {
-            throw ParserParameterCountException::withCounts('join', 4, count($parameters));
-        }
-        if (!in_array($parameters[0], $this->operatorMap)) {
-            throw new ParserInvalidParameterException("join parser - invalid join type " . $parameters[0]);
-        }
-        $this->tokenized = $parameters;
-    }
-
-    public function prepareQuery(Builder $eloquentBuilder): Builder
-    {
-        $tokenized = $this->tokenized;
-        $eloquentBuilder = $eloquentBuilder->join($tokenized[1], $tokenized[2], '=', $tokenized[3], $tokenized[0]);
-        return $eloquentBuilder;
+        $tokens = $this->tokens;
+        $query = $query->join($tokens[1], $tokens[2], '=', $tokens[3], $tokens[0]);
+        return $query;
     }
 }

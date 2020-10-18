@@ -1,29 +1,19 @@
 <?php
+declare(strict_types = 1);
 
 namespace Restive\Parsers;
 
 use Illuminate\Database\Eloquent\Builder;
-use Restive\Exceptions\ParserParameterCountException;
 
 class ParserColumns extends ParserAbstract
 {
-    public function tokenizeParameters(string $parameters)
-    {
-        $parameters = $this->handleSeparatedParameters($parameters);
-        if (count($parameters) === 0) {
-            throw new ParserParameterCountException("columns parser - missing parameters");
-        }
-        foreach ($parameters as $field) {
-            $this->tokenized[] = ['field' => $field];
-        }
-    }
+    protected $validator = ['separated', ',', null];
 
-    public function prepareQuery(Builder $eloquentBuilder): Builder
+    public function buildQuery(Builder $query) : Builder
     {
-        foreach ($this->tokenized as $parameters) {
-            $field = $parameters['field'];
-            $eloquentBuilder = $eloquentBuilder->addSelect($field);
+        foreach ($this->tokens as $token) {
+            $query = $query->addSelect($token);
         }
-        return $eloquentBuilder;
+        return $query;
     }
 }

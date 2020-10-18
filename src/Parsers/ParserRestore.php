@@ -7,18 +7,18 @@ use Restive\Exceptions\ApiException;
 
 class ParserRestore extends ParserAbstract
 {
-    public function tokenizeParameters(string $parameters)
-    {
-        $this->tokenized['restore'] = '';
-    }
+    protected $validator = ['boolean'];
 
-    public function prepareQuery(Builder $eloquentBuilder): Builder
+    public function buildQuery(Builder $query): Builder
     {
+        if ($this->tokens[0] !== 'true') {
+            return $query;
+        }
         try {
-            $eloquentBuilder->restore();
+            $query->restore();
         } catch (\BadMethodCallException $e) {
             throw new ApiException('Model does not support soft deletes');
         }
-        return $eloquentBuilder;
+        return $query;
     }
 }

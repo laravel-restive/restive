@@ -5,11 +5,11 @@ namespace Tests;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Tests\Fixtures\Models\ZcwiltPost;
+use Tests\Fixtures\Models\Post;
 use Restive\ApiQueryParser;
 use Restive\ParserFactory;
 use Illuminate\Support\Facades\Request;
-use Tests\Fixtures\Models\ZcwiltUser;
+use Tests\Fixtures\Models\User;
 
 abstract class TestCase extends Orchestra
 {
@@ -34,14 +34,12 @@ abstract class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix'   => '',
         ]);
-
-
     }
 
     public function createTables()
     {
-        Schema::dropIfExists('zcwilt_dummy');
-        Schema::create('zcwilt_dummy', function (Blueprint $table) {
+        Schema::dropIfExists('dummy');
+        Schema::create('dummy', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('email', 100)->unique();
@@ -57,8 +55,8 @@ abstract class TestCase extends Orchestra
             $table->timestamps();
         });
 
-        Schema::dropIfExists('zcwilt_users');
-        Schema::create('zcwilt_users', function (Blueprint $table) {
+        Schema::dropIfExists('users');
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('email', 100)->unique();
@@ -66,8 +64,8 @@ abstract class TestCase extends Orchestra
             $table->timestamps();
             $table->softDeletes();
         });
-        Schema::dropIfExists('zcwilt_posts');
-        Schema::create('zcwilt_posts', function (Blueprint $table) {
+        Schema::dropIfExists('posts');
+        Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('comment');
@@ -81,13 +79,13 @@ abstract class TestCase extends Orchestra
         $userTableTestData = $this->createUserTableTestData();
 
         foreach ($userTableTestData as $user) {
-            $userCreated = ZcwiltUser::create([
+            $userCreated = User::create([
                 'name' => $user['name'],
                 'email' => $user['email'],
                 'age' => $user['age'],
             ]);
             foreach ($user['posts'] as $post) {
-                ZcwiltPost::create([
+                Post::create([
                     'user_id' => $userCreated->id,
                     'comment' => $post['comment'],
                     'published' => $post['published']
@@ -104,7 +102,7 @@ abstract class TestCase extends Orchestra
         $api = new ApiQueryParser(new ParserFactory());
         $api->parseRequest($request);
         $api->buildParsers();
-        $query = $api->buildQuery(new ZcwiltUser);
+        $query = $api->buildQuery(new User);
         $result = $query->get()->toArray();
         return $result;
     }

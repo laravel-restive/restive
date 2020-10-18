@@ -1,151 +1,86 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Restive;
 
-use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\http\Request;
+use Restive\Contracts\RequestParser;
+use Restive\Exceptions\ApiException;
+use Restive\Parsers\ParserNull;
 
 class ApiQueryParser
 {
-    /*
-     * @var ParserFactory
-     *
-     */
-    protected $parserFactory;
-
-    /*
-     * @var array
-     *
-     */
-    protected $queryParts;
-
-    /*
-     * @var array
-     *
-     */
-    protected $parsedKeys;
-
-    public function __construct(ParserFactory $parserFactory)
+    public function buildParseKeys(Request $request) : array
     {
-        $this->parserFactory = $parserFactory;
-        $this->queryParts = [];
+        $queryString = $request->server()['QUERY_STRING'];
+        $parsedQuery = $this->parseQueryString($queryString);
+        return $parsedQuery;
     }
 
-    public function parseRequest(Request $request): ApiQueryParser
+    public function buildParserList(array $parsedQuery) : array
     {
-        $this->parsedKeys = [];
-        $queryParams = $this->getQueryParams($request);
-        if (count($queryParams)) {
-            $this->gatherKeys($queryParams);
+        $parserList = [];
+        foreach ($parsedQuery as $query) {
+            $parserList[] = $this->parserFactory($query[0], $query[1]);
         }
-        $this->sortParsedKeys();
-        return $this;
+        return $parserList;
     }
 
-    public function buildParsers(): ApiQueryParser
+    public function executeParsers(array $parsers, $model)
     {
-        $this->parseKeys();
-        return $this;
-    }
-
-    public function buildQuery(Model $model): Builder
-    {
-        if (!isset($this->parsedKeys['columns'])) {
-            $this->parsedKeys['columns'] = $model->getTable() . '.*';
-        }
         $query = $model->query();
-        $query = $this->buildRawQuery($query);
+        foreach ($parsers as $parser) {
+            try {
+                $this->parserParseValueTokens($parser);
+            } catch (ApiException $e) {
+                continue;
+            }
+            $query = $parser->buildQuery($query);
+        }
         return $query;
     }
 
-    public function getQueryParts(): array
-    {
-        return $this->queryParts;
-    }
-
-    public function getParserFactory(): ParserFactory
-    {
-        return $this->parserFactory;
-    }
-
-    public function getParsedKeys(): array
-    {
-        return $this->parsedKeys;
-    }
-
-    public function hasPart($part)
-    {
-        if (!isset($this->parsedKeys[$part])) {
-            return false;
-        }
-        return (count($this->parsedKeys[$part]) !== 0);
-    }
-
-    public function getLimit()
-    {
-        if (!$this->hasPart('limit')) {
-            return 0;
-        }
-        return $this->parsedKeys['limit'][0];
-    }
-
-    protected function gatherKeys(array $queryParams)
+    protected function parseQueryString(string $queryString) : array
     {
         $ignoreKeys = ['page', 'per_page', 'paginate'];
-        foreach ($queryParams as $key => $value) {
-            if (in_array($key, $ignoreKeys)) {
+        $queryParameters = [];
+        if (trim($queryString) === '') {
+            return $queryParameters;
+        }
+        $queryParts = explode('&', trim($queryString));
+        foreach ($queryParts as $queryPart) {
+            $parts = explode('=', $queryPart);
+            $queryKey = $parts[0] ?? '';
+            if (in_array($queryKey, $ignoreKeys)) {
                 continue;
             }
-            $this->parsedKeys[$key] = $value;
+            $queryKey = rtrim($queryKey, '[]');
+            $queryValue = $parts[1] ?? '';
+            $queryParameters[] = [$queryKey, $queryValue];
         }
+        return $queryParameters;
     }
 
-    protected function parseKeys()
+    protected function parserParseValueTokens(RequestParser $parser) : bool
     {
-        foreach ($this->parsedKeys as $action => $parameters) {
-            if (!is_array($parameters)) {
-                $parameters = [$parameters];
-            }
-            $this->parseKeysFromArray($action, $parameters);
+        $parser->tokenize();
+        if (!$parser->hasErrors()) {
+            return true;
         }
+        return false;
     }
 
-    protected function parseKeysFromArray(string $action, array $parameters)
+    protected function parserFactory($action, $parameters)
     {
-        foreach ($parameters as $parameter) {
-            $this->callParser($action, (string)$parameter);
+        $blacklist = config('restive.blacklist');
+        if (in_array($action, $blacklist)) {
+            return new ParserNull(['error' => 'blacklisted method - ' . $action]);
         }
-    }
-
-    protected function callParser(string $action, string $parameters)
-    {
-        $parser = $this->parserFactory->getParser($action);
-        $parser->parse($parameters);
-        $this->queryParts[] = $parser;
-    }
-
-    protected function buildRawQuery(Builder $eloquentQB): Builder
-    {
-        foreach ($this->queryParts as $parser) {
-            $eloquentQB = $parser->addQuery($eloquentQB);
+        $classname = __NAMESPACE__ . '\\Parsers\\' . 'Parser' . ucfirst($action);
+        if (!class_exists($classname)) {
+            throw new ApiException('unknown parser method - ' . $action);
         }
-        return $eloquentQB;
+        $class = new $classname(['values' => $parameters]);
+        return $class;
     }
 
-    protected function getQueryParams(Request $request): array
-    {
-        $params = $request->query();
-        return $params;
-    }
-
-    protected function sortParsedKeys()
-    {
-        if (!array_key_exists('force', $this->parsedKeys)) {
-            return;
-        }
-        $forced = $this->parsedKeys['force'];
-        unset($this->parsedKeys['force']);
-        $this->parsedKeys['force'] = $forced;
-    }
 }

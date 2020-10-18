@@ -1,14 +1,17 @@
 <?php
+declare(strict_types = 1);
 
 namespace Restive\Parsers;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class ParserWhereNotIn extends ParserWhereInAbstract
+class ParserWhereNotIn extends ParserWhereAbstract
 {
-    public function prepareQuery(Builder $eloquentBuilder): Builder
+    protected $validator = ['bracketed', ','];
+
+    public function buildQuery(Builder $query) : Builder
     {
-        $eloquentBuilder = $eloquentBuilder->whereNotIn($this->tokenized['col'], $this->tokenized['in']);
-        return $eloquentBuilder;
+        $query = $query->whereNotIn($this->tokens['col'], $this->tokens['in']);
+        return $query;
     }
 }

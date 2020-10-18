@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Restive\Parsers;
 
@@ -7,20 +8,14 @@ use Restive\Exceptions\ApiException;
 
 class ParserForce extends ParserAbstract
 {
-    public function tokenizeParameters(string $parameters)
-    {
-        $this->tokenized['forceDelete'] = $parameters ?? 'true';
-    }
+    protected $validator = ['boolean'];
 
-    public function prepareQuery(Builder $eloquentBuilder): Builder
+    public function buildQuery(Builder $query) : Builder
     {
-        try {
-            if ($this->tokenized['forceDelete'] === 'true') {
-                $eloquentBuilder->forceDelete();
-            }
-        } catch (\BadMethodCallException $e) {
-            throw new ApiException('Model does not support soft deletes');
+        if ($this->tokens[0] !== 'true') {
+           return $query;
         }
-        return $eloquentBuilder;
+        $query->forceDelete();
+        return $query;
     }
 }
