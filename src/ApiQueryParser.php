@@ -11,7 +11,8 @@ class ApiQueryParser
 {
     public function buildParseKeys(Request $request) : array
     {
-        $queryString = $request->server()['QUERY_STRING'];
+        $queryString = rawurldecode($request->server()['QUERY_STRING']);
+        dump($queryString);
         $parsedQuery = $this->parseQueryString($queryString);
         return $parsedQuery;
     }

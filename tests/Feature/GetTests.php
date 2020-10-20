@@ -56,4 +56,11 @@ class GetTests extends DatabaseTestCase
         $responseResult = json_decode($response->getContent())->errors;
         $this->assertEquals('unknown parser method - whereBetwee', $responseResult);
     }
+
+    /** @test */
+    public function it_parses_a_urlencoded_query()
+    {
+        $response = $this->get("/user?whereBetween%5b%5d=id:1:20");
+        $response->assertStatus(200);
+    }
 }
