@@ -7,5 +7,4 @@ use Restive\Http\Controllers\ApiController;
 class {{ class }} extends ApiController
 {
     protected string $modelName = '{{ model }}';
-    protected string $request = '{{ request }}';
 }
