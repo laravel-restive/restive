@@ -8,7 +8,4 @@ class {{ class }} extends ApiController
 {
     protected string $modelName = '{{ model }}';
     protected string $request = '{{ request }}';
-    protected string $resource = '{{ resource }}'
-    protected string $collection = '{{ resourceCollection }}'
-    protected string $paginator = '{{ paginator }}'
 }
