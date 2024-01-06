@@ -22,7 +22,7 @@ class ApiController extends AbstractApiController
         } catch (ApiException $e) {
             return response()->json(['errors' => $e->getMessage()], $e->getStatusCode());
         } catch (\Exception $e) {
-            return response()->json(['errors' => 'Internal Error'], 500);
+            return response()->json(['errors' => 'Internal Error'], 422);
         }
         return $resource->toResponse($request);
     }
@@ -50,7 +50,7 @@ class ApiController extends AbstractApiController
         } catch (ApiException $e) {
             return response()->json(['errors' => $e->getMessage()], $e->getStatusCode());
         } catch (\Exception $e) {
-            return response()->json(['errors' => 'Internal Error'], 500);
+            return response()->json(['errors' => 'Internal Error'], 422);
         }
         return response()->json($resource, 201);
     }

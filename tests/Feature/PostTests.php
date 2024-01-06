@@ -61,6 +61,6 @@ class PostTests extends DatabaseTestCase
             'name' => 'Dirk Gently',
             'age' => 38
         ]);
-        $response->assertStatus(500);
+        $response->assertStatus(422);
     }
 }
