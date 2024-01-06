@@ -43,4 +43,24 @@ class PostTests extends DatabaseTestCase
         $this->assertTrue($response->age === 38);
 
     }
+
+    /** @test */
+    public function post_user_with_duplicate_entry()
+    {
+        $response = $this->post("/user", [
+            'email' => 'dirk@holisticdetective.com',
+            'name' => 'Dirk Gently',
+            'age' => 38
+        ]);
+        $response->assertStatus(201);
+        $response = json_decode($response->getContent());
+        $this->assertTrue($response->age === 38);
+
+        $response = $this->post("/user", [
+            'email' => 'dirk@holisticdetective.com',
+            'name' => 'Dirk Gently',
+            'age' => 38
+        ]);
+        $response->assertStatus(500);
+    }
 }

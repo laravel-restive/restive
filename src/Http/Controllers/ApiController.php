@@ -44,8 +44,14 @@ class ApiController extends AbstractApiController
 
     public function store(Request $request): JsonResponse
     {
+        try {
         $result = $this->model->create($request->all());
         $resource = new $this->resource($result);
+        } catch (ApiException $e) {
+            return response()->json(['errors' => $e->getMessage()], $e->getStatusCode());
+        } catch (\Exception $e) {
+            return response()->json(['errors' => 'Internal Error'], 500);
+        }
         return response()->json($resource, 201);
     }
 
