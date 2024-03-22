@@ -8,7 +8,7 @@ Api Query Builder allows for complex filtering, sorting via an api endpoint.
 
 It is intended to be part of a larger package that also provides full CRUD abilities for a Laravel API.
 
-Full documentation is available [here](https://laravel-restive.github.io)
+Full documentation is available [here](https://laravel-restive.github.io/restive-docs)
 
 but see examples below for an idea of what the package provides.
 
@@ -47,4 +47,4 @@ You can restrict columns using
 ## Lots More ##
 
 Lots more filtering options are available.
-see the [Documentation](https://laravel-restive.github.io)    
+see the [Documentation](https://laravel-restive.github.io/restive-docs)    
