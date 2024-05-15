@@ -1,5 +1,6 @@
 /vendor
 /.idea
+*.iml
 /.phpunit.result.cache
 /composer.lock
 /test_reports
